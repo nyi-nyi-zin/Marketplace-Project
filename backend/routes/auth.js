@@ -3,6 +3,7 @@ const { body } = require("express-validator");
 const router = Router();
 
 const authController = require("../controllers/auth");
+const authMiddleware = require("../middleware/auth");
 
 router.post(
   "/register",
@@ -36,6 +37,14 @@ router.post(
     body("email").trim().isEmail().withMessage("Please enter valid email"),
   ],
   authController.login
+);
+
+//check user is login or not
+//get -> /get-current-user
+router.get(
+  "/get-current-user",
+  authMiddleware,
+  authController.checkCurrentUser
 );
 
 module.exports = router;

@@ -1,37 +1,43 @@
-import { Button, Form, Input, message } from "antd";
-import { registerUser, Login } from "../apicalls/auth";
+import { Form, Input, message } from "antd";
+
+import { loginUser, registerUser } from "../apicalls/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUserId } from "../store/slices/userSlice";
 
 const AuthForm = ({ isLoginPage }) => {
-  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleOnFinish = async (values) => {
     setSubmitting(true);
     if (isLoginPage) {
       try {
-        const response = await Login(values);
+        const response = await loginUser(values);
         if (response.isSuccess) {
-          message.success(response.message);
+          message.success(response.meessag);
           localStorage.setItem("token", response.token);
+          dispatch(setUserId(response.token));
           navigate("/");
         } else {
           throw new Error(response.message);
         }
-      } catch (error) {
-        message.error(error.message);
+      } catch (err) {
+        message.error(err.message);
       }
     } else {
       try {
         const response = await registerUser(values);
         if (response.isSuccess) {
           message.success(response.message);
+          navigate("/login");
         } else {
           throw new Error(response.message);
         }
-      } catch (error) {
-        message.error(error.message);
+      } catch (err) {
+        message.error(err.message);
       }
     }
     setSubmitting(false);
@@ -39,7 +45,7 @@ const AuthForm = ({ isLoginPage }) => {
 
   return (
     <section className="h-screen w-full flex items-center justify-center">
-      <div className="w-[450px]">
+      <div className=" w-[450px]">
         <h1 className="text-3xl font-bold mb-4 text-blue-600">
           POINT.IO - {isLoginPage ? "LOGIN" : "REGISTER"}
         </h1>
@@ -51,86 +57,89 @@ const AuthForm = ({ isLoginPage }) => {
               rules={[
                 {
                   required: true,
-                  message: "Name is required",
+                  message: "Name must contains.",
                 },
                 {
                   min: 3,
-                  message: "Name must have 3 characters",
+                  message: "Name must have 3 characters.",
                 },
               ]}
               hasFeedback
             >
-              <Input placeholder="name..." />
+              <Input placeholder="name ..."></Input>
             </Form.Item>
           )}
-
           <Form.Item
             name="email"
             label="Email"
             rules={[
               {
-                type: "email",
                 required: true,
-                message: "Enter a valid email",
+                message: "Email must contains.",
               },
               {
-                min: 5,
-                message: "Password must have 5 characters",
+                type: "email",
+                message: "Enter a valid E-mail !",
               },
             ]}
             hasFeedback
           >
-            <Input placeholder="email..." />
+            <Input placeholder="email ..."></Input>
           </Form.Item>
-
           <Form.Item
             name="password"
             label="Password"
             rules={[
               {
                 required: true,
-                message: "Password is required",
+                message: "Password must contains.",
+              },
+              {
+                min: 5,
+                message: "Password must have 5 characters.",
               },
             ]}
             hasFeedback
           >
-            <Input.Password placeholder="password..." />
+            <Input.Password placeholder="password ..."></Input.Password>
           </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="w-full"
+            <button
+              className="w-full outline-none bg-blue-600 text-white py-2 rounded-md"
               disabled={submitting}
             >
-              {isLoginPage
-                ? submitting
-                  ? "Logging"
-                  : "Login"
-                : submitting
-                ? "Submitting"
-                : "Register"}
-            </Button>
+              {isLoginPage && !submitting && "Login"}
+              {!isLoginPage && !submitting && "Register"}
+              {submitting && "Submitting"}
+            </button>
+          </Form.Item>
+          <p>
             {isLoginPage ? (
               <p>
-                Don't have an account?
-                <Link to="/register" className="text-blue-600">
-                  {" "}
-                  Register now!
+                Don't have an account ?{" "}
+                <Link
+                  to={"/register"}
+                  className=" font-medium text-blue-600 hover:text-blue-600"
+                >
+                  Register here
                 </Link>
               </p>
             ) : (
               <p>
-                Already have an account?{" "}
-                <Link to="/login" className="text-blue-600">
-                  Login now!
+                Already have an account ?{" "}
+                <Link
+                  to={"/login"}
+                  className=" font-medium text-blue-600 hover:text-blue-600"
+                >
+                  Login here
                 </Link>
               </p>
             )}
-          </Form.Item>
+          </p>
         </Form>
       </div>
     </section>
   );
 };
+
 export default AuthForm;
