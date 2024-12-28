@@ -1,16 +1,17 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       isSuccess: false,
-      message: errors.array()[0],
+      message: errors.array()[0].msg,
     });
   }
-  const [name, email, password] = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const userDoc = await User.findOne({ email });
@@ -31,11 +32,52 @@ exports.register = async (req, res, next) => {
       message: "User created successfully",
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(409).json({
       isSuccess: false,
-      message: errors.message,
+      message: error.message,
     });
   }
 };
 
-exports.login = (req, res, next) => {};
+exports.login = async (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      isSuccess: false,
+      message: errors.array()[0].msg,
+    });
+  }
+  const { email, password } = req.body;
+  try {
+    //is email exists
+    const userDoc = await User.findOne({ email });
+
+    if (!userDoc) {
+      throw new Error("E-mail does not exists");
+    }
+
+    //check password
+    const isMatch = await bcrypt.compare(password, userDoc.password);
+
+    if (!isMatch) {
+      throw new Error("Invalid password");
+    }
+
+    //create jwt token
+    const token = jwt.sign({ userId: userDoc._id }, process.env.JWT_KEY, {
+      expiresIn: "1d",
+    });
+
+    return res.status(200).json({
+      isSuccess: true,
+      message: "Logged in successfully",
+      token,
+    });
+  } catch (error) {
+    return res.status(401).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};

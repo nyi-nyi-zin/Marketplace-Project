@@ -1,7 +1,40 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
+import { registerUser, Login } from "../apicalls/auth";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const AuthForm = ({ isLoginPage }) => {
-  const handleOnFinish = async (values) => {};
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleOnFinish = async (values) => {
+    setSubmitting(true);
+    if (isLoginPage) {
+      try {
+        const response = await Login(values);
+        if (response.isSuccess) {
+          message.success(response.message);
+          localStorage.setItem("token", response.token);
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (error) {
+        message.error(error.message);
+      }
+    } else {
+      try {
+        const response = await registerUser(values);
+        if (response.isSuccess) {
+          message.success(response.message);
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (error) {
+        message.error(error.message);
+      }
+    }
+    setSubmitting(false);
+  };
+
   return (
     <section className="h-screen w-full flex items-center justify-center">
       <div className="w-[450px]">
@@ -18,6 +51,10 @@ const AuthForm = ({ isLoginPage }) => {
                   required: true,
                   message: "Name is required",
                 },
+                {
+                  min: 3,
+                  message: "Name must have 3 characters",
+                },
               ]}
               hasFeedback
             >
@@ -33,6 +70,10 @@ const AuthForm = ({ isLoginPage }) => {
                 type: "email",
                 required: true,
                 message: "Enter a valid email",
+              },
+              {
+                min: 5,
+                message: "Password must have 5 characters",
               },
             ]}
             hasFeedback
@@ -54,9 +95,36 @@ const AuthForm = ({ isLoginPage }) => {
             <Input.Password placeholder="password..." />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full">
-              Register
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full"
+              disabled={submitting}
+            >
+              {isLoginPage
+                ? submitting
+                  ? "Logging"
+                  : "Login"
+                : submitting
+                ? "Submitting"
+                : "Register"}
             </Button>
+            {isLoginPage ? (
+              <p>
+                Don't have an account?
+                <Link to="/register" className="text-blue-600">
+                  {" "}
+                  Register now!
+                </Link>
+              </p>
+            ) : (
+              <p>
+                Already have an account?{" "}
+                <Link to="/login" className="text-blue-600">
+                  Login now!
+                </Link>
+              </p>
+            )}
           </Form.Item>
         </Form>
       </div>
