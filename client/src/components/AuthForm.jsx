@@ -1,9 +1,10 @@
 import { Button, Form, Input, message } from "antd";
 import { registerUser, Login } from "../apicalls/auth";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AuthForm = ({ isLoginPage }) => {
+  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
   const handleOnFinish = async (values) => {
@@ -14,6 +15,7 @@ const AuthForm = ({ isLoginPage }) => {
         if (response.isSuccess) {
           message.success(response.message);
           localStorage.setItem("token", response.token);
+          navigate("/");
         } else {
           throw new Error(response.message);
         }
