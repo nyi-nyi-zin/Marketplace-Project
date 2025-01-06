@@ -5,6 +5,7 @@ const cors = require("cors");
 
 //routes imports
 const authRoutes = require("./routes/auth");
+const productRoutes = require("./routes/product");
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cors({ origin: "*" }));
 
 app.use(authRoutes);
+app.use(productRoutes);
 
 mongoose.connect(process.env.MONGO_URL).then((_) => {
   app.listen(4000);

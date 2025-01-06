@@ -1,8 +1,10 @@
-import { Checkbox, Col, Form, Input, Row, Select } from "antd";
+import { Checkbox, Col, Form, Input, message, Row, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { SquaresPlusIcon } from "@heroicons/react/24/solid";
 
-const AddProduct = () => {
+import { sellProduct } from "../../apicalls/product";
+
+const AddProduct = ({ setActiveTabKey }) => {
   const options = [
     {
       value: "clothing_and_fashion",
@@ -47,15 +49,24 @@ const AddProduct = () => {
       value: "Vocher",
     },
   ];
+
+  const onFinishHandler = async (values) => {
+    try {
+      const response = await sellProduct(values);
+      if (response.isSuccess) {
+        message.success(response.message);
+        setActiveTabKey("1");
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (err) {
+      message.error(err.message);
+    }
+  };
   return (
     <section>
       <h1 className="text-2xl font-bold my-2">What you want to sell ?</h1>
-      <Form
-        layout="vertical"
-        onFinish={(values) => {
-          console.log(values);
-        }}
-      >
+      <Form layout="vertical" onFinish={onFinishHandler}>
         <Form.Item
           name="product_name"
           label="Product Name"
