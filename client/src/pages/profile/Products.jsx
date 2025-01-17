@@ -28,6 +28,7 @@ const Products = ({
       message.error(err.message);
     }
   };
+
   return (
     <section>
       <h1 className=" text-3xl font-semibold my-2">Products List</h1>
@@ -80,6 +81,16 @@ const Products = ({
                     </td>
 
                     <td className="px-6 py-4">
+                      <button
+                        type="button"
+                        className="font-medium text-green-600 hover:underline me-4"
+                        onClick={() => {
+                          editHandler(product._id);
+                        }}
+                      >
+                        Upload
+                      </button>
+
                       <button
                         type="button"
                         className="font-medium text-blue-600 hover:underline me-4"

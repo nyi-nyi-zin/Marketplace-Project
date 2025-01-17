@@ -3,7 +3,7 @@ import { getAllProducts } from "../../apicalls/product";
 import { message } from "antd";
 import { Tabs } from "antd";
 import Products from "./Products";
-import AddProduct from "./AddProduct";
+import ManageProduct from "./ManageProduct";
 import General from "./General";
 
 const Index = () => {
@@ -49,7 +49,7 @@ const Index = () => {
       key: "2",
       label: "Manage Product",
       children: (
-        <AddProduct
+        <ManageProduct
           setActiveTabKey={setActiveTabKey}
           getProducts={getProducts}
           editMode={editMode}
