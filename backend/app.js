@@ -12,16 +12,16 @@ const app = express();
 
 const storageConfig = multer.diskStorage({
   filename: (req, file, cb) => {
-    const suffix = Date.now() + "_" + Math.round(Math.random() * 1e9);
-    cb(null, suffix + "_" + file.originalname);
+    const suffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, suffix + "-" + file.originalname);
   },
 });
 
 const filterConfig = (req, file, cb) => {
   if (
-    file.mimetype === "image/png " ||
-    file.mimetype === "image/jpg " ||
-    file.mimetype === "image/jpeg "
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
   ) {
     cb(null, true);
   } else {

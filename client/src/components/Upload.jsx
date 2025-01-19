@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/solid";
 import { uploadImage } from "../apicalls/product";
+import { message } from "antd";
 
-const Upload = () => {
+const Upload = ({ editProductId, setActiveTabKey }) => {
   const [previewImages, setPreviewImages] = useState([]);
   const [images, setImages] = useState([]);
 
   const onchangeHandler = (event) => {
     const selectedImages = event.target.files;
-    setImages((prev) => prev.concat(selectedImages));
     const selectedImagesArray = Array.from(selectedImages);
-
+    setImages((prev) => [...prev, ...selectedImagesArray]);
     const previewImagesArray = selectedImagesArray.map((img) => {
       return URL.createObjectURL(img);
     });
@@ -18,22 +18,31 @@ const Upload = () => {
   };
 
   const deleteHandler = (img) => {
-    setPreviewImages(previewImages.filter((element) => element !== img));
-    console.log(img);
-    URL.revokeObjectURL(img);
+    const indexToDelete = previewImages.findIndex((e) => e === img);
+
+    if (indexToDelete !== -1) {
+      const updatedSeletedImages = [...images];
+      updatedSeletedImages.splice(indexToDelete, 1);
+
+      setImages(updatedSeletedImages);
+      setPreviewImages((prevImg) => prevImg.filter((e) => e !== img));
+
+      URL.revokeObjectURL(img);
+    }
   };
 
   const submitHandler = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    for (let i = 0; i > images.length; i++) {
+    for (let i = 0; i < images.length; i++) {
       formData.append("product_images", images[i]);
     }
-
+    formData.append("product_id", editProductId);
     try {
       const response = await uploadImage(formData);
       if (response.isSuccess) {
         message.success(response.message);
+        setActiveTabKey("1");
       } else {
         throw new Error(response.message);
       }

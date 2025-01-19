@@ -59,6 +59,7 @@ export const uploadImage = async (formData) => {
     const response = await axiosInstance.post(`/upload`, formData, {
       validateStatus: () => true,
     });
+
     return response.data;
   } catch (error) {
     return error.message;
