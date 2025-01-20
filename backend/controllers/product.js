@@ -154,16 +154,19 @@ exports.deleteProduct = async (req, res) => {
           img.lastIndexOf("/") + 1,
           img.lastIndexOf(".")
         );
+
         return new Promise((resolve, reject) => {
           cloudinary.uploader.destroy(publicId, (err, result) => {
             if (err) {
               reject(new Error("Destroy Failed"));
             } else {
+              console.log(result);
               resolve(result);
             }
           });
         });
       });
+
       await Promise.all(deletePromise);
     }
 
@@ -184,6 +187,7 @@ exports.deleteProduct = async (req, res) => {
 //uploadImage
 exports.uploadProductImages = async (req, res) => {
   const productImages = req.files;
+  console.log(productImages);
   const productId = req.body.product_id;
   let secureUrlArray = [];
 
@@ -208,6 +212,53 @@ exports.uploadProductImages = async (req, res) => {
           throw new Error("Cloud Upload Failed");
         }
       });
+    });
+  } catch (error) {
+    return res.status(404).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.getSavedImages = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const productDoc = await Product.findById(id).select("images");
+    if (!productDoc) {
+      throw new Error("Product not found");
+    }
+    return res.status(200).json({
+      isSuccess: true,
+      message: "Product images are fetched",
+      data: productDoc,
+    });
+  } catch (err) {
+    return res.status(404).json({
+      isSuccess: false,
+      message: err.message,
+    });
+  }
+};
+
+exports.deleteProductImages = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    const decodeImgToDelete = decodeURIComponent(req.params.imgToDelete);
+
+    await Product.findByIdAndUpdate(productId, {
+      $pull: { images: decodeImgToDelete },
+    });
+
+    const publicId = decodeImgToDelete.substring(
+      decodeImgToDelete.lastIndexOf("/") + 1,
+      decodeImgToDelete.lastIndexOf(".")
+    );
+    await cloudinary.uploader.destroy(publicId);
+
+    return res.status(200).json({
+      isSuccess: true,
+      message: "Image destroyed",
     });
   } catch (error) {
     return res.status(404).json({

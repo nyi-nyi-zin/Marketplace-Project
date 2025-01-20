@@ -88,4 +88,19 @@ router.delete("/products/:id", authMiddleware, productController.deleteProduct);
 // POST / upload
 router.post("/upload", authMiddleware, productController.uploadProductImages);
 
+//get saved product images
+// GET  /product-images/:id
+router.get(
+  "/product-images/:id",
+  authMiddleware,
+  productController.getSavedImages
+);
+
+//delete product image
+// DELETE /products/images/destroy/:productId/:imgToDelete
+router.delete(
+  "/products/images/destroy/:productId/:imgToDelete",
+  authMiddleware,
+  productController.deleteProductImages
+);
 module.exports = router;
