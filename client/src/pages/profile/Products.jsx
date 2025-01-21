@@ -8,6 +8,7 @@ const Products = ({
   setEditMode,
   setEditProductId,
   getProducts,
+  setManageTabKey,
 }) => {
   const editHandler = (product_id) => {
     setEditMode(true);
@@ -27,6 +28,13 @@ const Products = ({
     } catch (err) {
       message.error(err.message);
     }
+  };
+
+  const uploadHandler = (product_id) => {
+    setEditMode(true);
+    setActiveTabKey("2");
+    setEditProductId(product_id);
+    setManageTabKey("2");
   };
 
   return (
@@ -85,7 +93,7 @@ const Products = ({
                         type="button"
                         className="font-medium text-green-600 hover:underline me-4"
                         onClick={() => {
-                          editHandler(product._id);
+                          uploadHandler(product._id);
                         }}
                       >
                         Upload

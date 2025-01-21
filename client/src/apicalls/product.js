@@ -86,7 +86,6 @@ export const deleteSavedImages = async (payload) => {
     const { productId, imgToDelete } = payload;
     console.log(imgToDelete);
     const encodeImgToDelete = encodeURIComponent(imgToDelete);
-    console.log(encodeImgToDelete);
     const response = await axiosInstance.delete(
       `/products/images/destroy/${productId}/${encodeImgToDelete}`,
       {
