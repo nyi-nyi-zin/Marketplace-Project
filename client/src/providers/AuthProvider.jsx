@@ -13,7 +13,6 @@ const AuthProvider = ({ children }) => {
       const response = await checkCurrentUser();
       if (response.isSuccess) {
         dispatch(setUser(response.userDoc));
-        //    codes
       } else {
         navigate("/");
         throw new Error(response.message);

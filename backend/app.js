@@ -7,6 +7,7 @@ const multer = require("multer");
 //routes imports
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/product");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
@@ -37,9 +38,10 @@ app.use(
     "product_images"
   )
 );
-
 app.use(authRoutes);
 app.use(productRoutes);
+
+app.use("/admin", adminRoutes);
 
 mongoose.connect(process.env.MONGO_URL).then((_) => {
   app.listen(4000);

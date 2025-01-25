@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API,
 });
 
-exports.addNewProduct = async (req, res) => {
+exports.addNewProduct = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {

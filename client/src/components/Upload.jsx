@@ -5,13 +5,22 @@ import {
   getSavedImages,
   uploadImage,
 } from "../apicalls/product";
+
 import { message } from "antd";
+
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { setLoader } from "../store/slices/loaderSlice";
 
 const Upload = ({ editProductId, setActiveTabKey }) => {
   //blob: URL
   const [previewImages, setPreviewImages] = useState([]);
   const [images, setImages] = useState([]); //real file type
   const [savedImages, setSavedImages] = useState([]);
+  const [selectedImagesCount, setSelectedImagesCount] = useState(0);
+  const { isProcessing } = useSelector((state) => state.reducer.loader);
+
+  const dispatch = useDispatch();
 
   const getImages = async (product_id) => {
     try {
@@ -33,6 +42,9 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
   const onchangeHandler = (event) => {
     const selectedImages = event.target.files;
     const selectedImagesArray = Array.from(selectedImages);
+
+    //update selected images count
+    setSelectedImagesCount((prev) => prev + selectedImagesArray.length);
     setImages((prev) => [...prev, ...selectedImagesArray]);
     const previewImagesArray = selectedImagesArray.map((img) => {
       return URL.createObjectURL(img);
@@ -45,6 +57,10 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
     const indexToDelete = previewImages.findIndex((e) => {
       return e === img;
     });
+
+    //update selected images count
+    setSelectedImagesCount((prev) => prev - 1);
+
     if (indexToDelete !== -1) {
       const updatedSeletedImages = [...images];
       updatedSeletedImages.splice(indexToDelete, 1);
@@ -59,24 +75,31 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    for (let i = 0; i < images.length; i++) {
-      formData.append("product_images", images[i]);
-    }
-    console.log(formData);
-    formData.append("product_id", editProductId);
-    try {
-      const response = await uploadImage(formData);
-      if (response.isSuccess) {
-        message.success(response.message);
+    dispatch(setLoader(true));
 
-        setActiveTabKey("1");
-      } else {
-        throw new Error(response.message);
+    if (selectedImagesCount > 1) {
+      const formData = new FormData();
+      for (let i = 0; i < images.length; i++) {
+        formData.append("product_images", images[i]);
       }
-    } catch (err) {
-      message.error(err.message);
+
+      formData.append("product_id", editProductId);
+      try {
+        const response = await uploadImage(formData);
+        if (response.isSuccess) {
+          message.success(response.message);
+
+          setActiveTabKey("1");
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (err) {
+        message.error(err.message);
+      }
+    } else {
+      message.error("Please select at least two images");
     }
+    dispatch(setLoader(false));
   };
 
   const savedImageDeleteHandler = async (img) => {
@@ -163,9 +186,14 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
               </div>
             ))}
         </div>
-        <button className="block my-4 text-white bg-blue-600 rounded-md px-3 py-2 font-medium">
-          Upload
-        </button>
+        {selectedImagesCount > 1 && (
+          <button
+            className="block my-4 text-white bg-blue-600 rounded-md px-3 py-2 font-medium"
+            disabled={isProcessing || selectedImagesCount < 1}
+          >
+            {isProcessing ? "Uploading..." : "Upload"}
+          </button>
+        )}
       </form>
     </section>
   );
