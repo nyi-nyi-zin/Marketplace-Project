@@ -1,11 +1,11 @@
 import moment from "moment";
 import React from "react";
+import { message } from "antd";
 import {
   approveProduct,
   rejectProduct,
-  rollbackProduct,
+  rollBackProduct,
 } from "../../apicalls/admin";
-import { message } from "antd";
 
 const Products = ({ products, getProducts }) => {
   const approveHandler = async (productId) => {
@@ -38,7 +38,7 @@ const Products = ({ products, getProducts }) => {
 
   const rollbackHandler = async (productId) => {
     try {
-      const response = await rollbackProduct(productId);
+      const response = await rollBackProduct(productId);
       if (response.isSuccess) {
         message.success(response.message);
         getProducts();
@@ -98,7 +98,7 @@ const Products = ({ products, getProducts }) => {
                         <span className=" bg-yellow-400 text-xs p-1 rounded-md text-white">
                           {product.status}
                         </span>
-                      )}
+                      )}{" "}
                       {product.status === "approve" && (
                         <span className="bg-green-400 text-xs p-1 rounded-md text-white">
                           {product.status}
@@ -111,72 +111,47 @@ const Products = ({ products, getProducts }) => {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      {product.status === "pending" && (
-                        <>
-                          <button
-                            type="button"
-                            className="font-medium text-blue-600 hover:underline me-4"
-                            onClick={() => {
-                              approveHandler(product._id);
-                            }}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            type="button"
-                            className="font-medium text-red-600 hover:underline me-4"
-                            onClick={() => {
-                              rejectHandler(product._id);
-                            }}
-                          >
-                            Reject
-                          </button>
-                        </>
+                      {product.status === "approve" ? (
+                        <button
+                          type="button"
+                          className="font-medium text-blue-600 hover:underline me-4"
+                          onClick={() => {
+                            rollbackHandler(product._id);
+                          }}
+                        >
+                          Roll Back
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="font-medium text-blue-600 hover:underline me-4"
+                          onClick={() => {
+                            approveHandler(product._id);
+                          }}
+                        >
+                          Approve
+                        </button>
                       )}
-                      {product.status === "approve" && (
-                        <>
-                          <button
-                            type="button"
-                            className="font-medium text-red-600 hover:underline me-4"
-                            onClick={() => {
-                              rejectHandler(product._id);
-                            }}
-                          >
-                            Reject
-                          </button>
-                          <button
-                            type="button"
-                            className="font-medium text-yellow-600 hover:underline me-4"
-                            onClick={() => {
-                              rollbackHandler(product._id);
-                            }}
-                          >
-                            Roll Back
-                          </button>
-                        </>
-                      )}
-                      {product.status === "reject" && (
-                        <>
-                          {" "}
-                          <button
-                            type="button"
-                            className="font-medium text-blue-600 hover:underline me-4"
-                            onClick={() => {
-                              approveHandler(product._id);
-                            }}
-                          >
-                            Approve
-                          </button>{" "}
-                          <button
-                            type="button"
-                            className="font-medium text-yellow-600 hover:underline me-4"
-                            onClick={() => {
-                              rollbackHandler(product._id);
-                            }}
-                          >
-                            Roll Back
-                          </button>
-                        </>
+                      {product.status === "reject" ? (
+                        <button
+                          type="button"
+                          className="font-medium text-red-600 hover:underline me-4"
+                          onClick={() => {
+                            rollbackHandler(product._id);
+                          }}
+                        >
+                          Roll Back
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="font-medium text-red-600 hover:underline me-4"
+                          onClick={() => {
+                            rejectHandler(product._id);
+                          }}
+                        >
+                          Reject
+                        </button>
                       )}
                     </td>
                   </tr>

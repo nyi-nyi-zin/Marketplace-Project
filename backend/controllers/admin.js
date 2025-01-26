@@ -91,12 +91,12 @@ exports.rollbackProduct = async (req, res) => {
   }
 };
 
+//get all users
 exports.getUsers = async (req, res) => {
   try {
     const UserDocs = await User.find()
       .select("name email role createdAt status")
       .sort({ createdAt: -1 });
-    console.log(UserDocs);
     return res.status(200).json({
       isSuccess: true,
       UserDocs,

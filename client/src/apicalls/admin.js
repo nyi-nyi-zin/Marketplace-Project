@@ -43,7 +43,7 @@ export const rejectProduct = async (productId) => {
 };
 
 //rollback product
-export const rollbackProduct = async (productId) => {
+export const rollBackProduct = async (productId) => {
   try {
     const response = await axiosInstance.post(
       `/admin/product-rollback/${productId}`,

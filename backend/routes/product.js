@@ -4,7 +4,7 @@ const { body } = require("express-validator");
 const router = Router();
 
 const productController = require("../controllers/product");
-const  authMiddleware  = require("../middleware/auth");
+const authMiddleware = require("../middleware/auth");
 
 // add product
 // POST /create-product
@@ -32,9 +32,6 @@ router.post(
       .trim()
       .notEmpty()
       .withMessage("product usedFor must have."),
-    body("product_details")
-      .isArray()
-      .withMessage("product details must array."),
   ],
   productController.addNewProduct
 );

@@ -1,25 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { banUser, getAllUsers, unBanUser } from "../../apicalls/admin";
+import { useEffect } from "react";
+import { banUser, unBanUser } from "../../apicalls/admin";
 import { message } from "antd";
 import moment from "moment";
 
-const Users = () => {
-  const [users, setUsers] = useState([]);
-  console.log(users);
-
-  const getUsers = async () => {
-    try {
-      const response = await getAllUsers();
-      if (response.isSuccess) {
-        setUsers(response.UserDocs);
-      } else {
-        throw new Error(response.message);
-      }
-    } catch (err) {
-      message.error(err.message);
-    }
-  };
-  useEffect(() => {
+const Users = ({ users, getUsers }) => {
+  useEffect((_) => {
     getUsers();
   }, []);
 
@@ -50,6 +35,7 @@ const Users = () => {
       message.error(err.message);
     }
   };
+
   return (
     <section>
       <h1 className=" text-3xl font-semibold my-2">User List</h1>
@@ -78,7 +64,7 @@ const Users = () => {
             </tr>
           </thead>
           <tbody className="text-center">
-            {users.length > 0 ? (
+            {users && users.length > 0 ? (
               <>
                 {users.map((user) => (
                   <tr className="bg-white border-b " key={user._id}>
