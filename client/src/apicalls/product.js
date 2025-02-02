@@ -1,10 +1,9 @@
 import { axiosInstance } from "./axiosInstance";
 
-//sell product
+// sell product
 export const sellProduct = async (payload) => {
   try {
     const response = await axiosInstance.post("/create-product", payload);
-
     return response.data;
   } catch (error) {
     return error.message;
@@ -21,7 +20,7 @@ export const getAllProducts = async () => {
   }
 };
 
-//get old product
+// get old product
 export const getOldProduct = async (id) => {
   try {
     const response = await axiosInstance.get(`/products/${id}`);
@@ -31,7 +30,7 @@ export const getOldProduct = async (id) => {
   }
 };
 
-//update product
+// update product
 export const updateProduct = async (payload) => {
   try {
     const response = await axiosInstance.post("/update-product", payload);
@@ -59,7 +58,6 @@ export const uploadImage = async (formData) => {
     const response = await axiosInstance.post(`/upload`, formData, {
       validateStatus: () => true,
     });
-
     return response.data;
   } catch (error) {
     return error.message;
@@ -72,7 +70,6 @@ export const getSavedImages = async (id) => {
     const response = await axiosInstance.get(`/product-images/${id}`, {
       validateStatus: () => true,
     });
-
     return response.data;
   } catch (error) {
     return error.message;
@@ -81,17 +78,28 @@ export const getSavedImages = async (id) => {
 
 // delete product saved image
 export const deleteSavedImages = async (payload) => {
-  // /products/images/destroy/:productId/:imgToDelete
   try {
     const { productId, imgToDelete } = payload;
-    console.log(imgToDelete);
     const encodeImgToDelete = encodeURIComponent(imgToDelete);
+
     const response = await axiosInstance.delete(
       `/products/images/destroy/${productId}/${encodeImgToDelete}`,
       {
         validateStatus: () => true,
       }
     );
+    return response.data;
+  } catch (error) {
+    return error.message;
+  }
+};
+
+//////////////////////////// PUBLIC ////////////////////////////////////
+
+// get all products
+export const getProducts = async () => {
+  try {
+    const response = await axiosInstance.get("/api/products");
     return response.data;
   } catch (error) {
     return error.message;

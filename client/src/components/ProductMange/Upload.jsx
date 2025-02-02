@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/solid";
 import {
   deleteSavedImages,
   getSavedImages,
   uploadImage,
-} from "../apicalls/product";
+} from "../../apicalls/product";
 
 import { message } from "antd";
 
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import { setLoader } from "../store/slices/loaderSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoader } from "../../store/slices/loaderSlice";
 
 const Upload = ({ editProductId, setActiveTabKey }) => {
-  //blob: URL
   const [previewImages, setPreviewImages] = useState([]);
-  const [images, setImages] = useState([]); //real file type
+  const [images, setImages] = useState([]);
   const [savedImages, setSavedImages] = useState([]);
+
   const [selectedImagesCount, setSelectedImagesCount] = useState(0);
+
   const { isProcessing } = useSelector((state) => state.reducer.loader);
 
   const dispatch = useDispatch();
@@ -30,35 +30,35 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
       } else {
         throw new Error(response.message);
       }
-    } catch (error) {
-      message.error(error.message);
+    } catch (err) {
+      message.error(err.message);
     }
   };
 
-  useEffect(() => {
+  useEffect((_) => {
     getImages(editProductId);
   }, []);
 
-  const onchangeHandler = (event) => {
-    const selectedImages = event.target.files;
-    const selectedImagesArray = Array.from(selectedImages);
+  const onChangeHandler = (event) => {
+    const seletedImages = event.target.files;
+    const seletedImagesArray = Array.from(seletedImages);
 
-    //update selected images count
-    setSelectedImagesCount((prev) => prev + selectedImagesArray.length);
-    setImages((prev) => [...prev, ...selectedImagesArray]);
-    const previewImagesArray = selectedImagesArray.map((img) => {
+    // update selected images count
+    setSelectedImagesCount((prev) => prev + seletedImagesArray.length);
+
+    setImages((prev) => [...prev, ...seletedImagesArray]);
+
+    const previewImagesArray = seletedImagesArray.map((img) => {
       return URL.createObjectURL(img);
     });
+
     setPreviewImages((prev) => prev.concat(previewImagesArray));
   };
 
-  //Handle Delete previewImg
   const deleteHandler = (img) => {
-    const indexToDelete = previewImages.findIndex((e) => {
-      return e === img;
-    });
+    const indexToDelete = previewImages.findIndex((e) => e === img);
 
-    //update selected images count
+    // update selected images count
     setSelectedImagesCount((prev) => prev - 1);
 
     if (indexToDelete !== -1) {
@@ -66,7 +66,6 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
       updatedSeletedImages.splice(indexToDelete, 1);
 
       setImages(updatedSeletedImages);
-
       setPreviewImages((prevImg) => prevImg.filter((e) => e !== img));
 
       URL.revokeObjectURL(img);
@@ -82,13 +81,11 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
       for (let i = 0; i < images.length; i++) {
         formData.append("product_images", images[i]);
       }
-
       formData.append("product_id", editProductId);
       try {
         const response = await uploadImage(formData);
         if (response.isSuccess) {
           message.success(response.message);
-
           setActiveTabKey("1");
         } else {
           throw new Error(response.message);
@@ -97,7 +94,7 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
         message.error(err.message);
       }
     } else {
-      message.error("Please select at least two images");
+      message.error("Please select at least two images.");
     }
     dispatch(setLoader(false));
   };
@@ -114,8 +111,8 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
       } else {
         throw new Error(response.message);
       }
-    } catch (error) {
-      message.error(error.message);
+    } catch (err) {
+      message.error(err.message);
     }
   };
 
@@ -166,21 +163,21 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
           name="product_images"
           multiple
           accept="image/png,image/jpeg,image/jpg"
-          onChange={onchangeHandler}
+          onChange={onChangeHandler}
         />
         <div className="flex gap-2 mt-4">
           {previewImages &&
             previewImages.map((img, index) => (
-              <div key={index} className="basis-1/6 h-32 relative">
+              <div key={img} className="basis-1/6 h-32 relative">
                 <img
                   src={img}
-                  alt={index}
+                  alt={`preview-${index}`}
                   className="w-full h-full object-cover rounded-md"
                 />
                 <TrashIcon
                   width={20}
                   height={20}
-                  className="absolute z-20 bottom-2 right-3  text-white cursor-pointer"
+                  className=" absolute z-20 bottom-2 right-3 text-white cursor-pointer"
                   onClick={() => deleteHandler(img)}
                 />
               </div>
@@ -189,7 +186,7 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
         {selectedImagesCount > 1 && (
           <button
             className="block my-4 text-white bg-blue-600 rounded-md px-3 py-2 font-medium"
-            disabled={isProcessing || selectedImagesCount < 1}
+            disabled={isProcessing && selectedImagesCount < 1}
           >
             {isProcessing ? "Uploading..." : "Upload"}
           </button>
@@ -198,4 +195,5 @@ const Upload = ({ editProductId, setActiveTabKey }) => {
     </section>
   );
 };
+
 export default Upload;

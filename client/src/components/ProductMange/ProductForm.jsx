@@ -1,20 +1,24 @@
-import { Checkbox, Col, Form, Input, message, Row, Select } from "antd";
+import { Checkbox, Col, Form, Input, Row, Select, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import {
   SquaresPlusIcon,
   EllipsisHorizontalIcon,
 } from "@heroicons/react/24/solid";
 
-import { sellProduct, getOldProduct, updateProduct } from "../apicalls/product";
+import {
+  sellProduct,
+  getOldProduct,
+  updateProduct,
+} from "../../apicalls/product";
 import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setLoader } from "../store/slices/loaderSlice";
+import { setLoader } from "../../store/slices/loaderSlice";
 
 const ProductForm = ({
   setActiveTabKey,
-  editMode,
   getProducts,
+  editMode,
   editProductId,
 }) => {
   const [form] = Form.useForm();
@@ -79,7 +83,6 @@ const ProductForm = ({
       } else {
         response = await sellProduct(values);
       }
-
       if (response.isSuccess) {
         form.resetFields();
         message.success(response.message);
@@ -114,23 +117,26 @@ const ProductForm = ({
       } else {
         throw new Error(response.message);
       }
-    } catch (error) {
-      message.error(error.message);
+    } catch (err) {
+      message.error(err.message);
     }
   };
 
-  useEffect(() => {
-    if (editMode) {
-      getOldProductData();
-    } else {
-      form.resetFields();
-    }
-  }, [editMode]);
+  useEffect(
+    (_) => {
+      if (editMode) {
+        getOldProductData();
+      } else {
+        form.resetFields();
+      }
+    },
+    [editMode]
+  );
 
   return (
     <section>
-      <h1 className="text-2xl font-bold my-2">
-        {editMode ? "Update your product here" : "What you want to sell ?"}
+      <h1 className="text-3xl font-semibold my-2">
+        {editMode ? "Update your product here." : "What you want to sell ?"}
       </h1>
       <Form layout="vertical" onFinish={onFinishHandler} form={form}>
         <Form.Item
