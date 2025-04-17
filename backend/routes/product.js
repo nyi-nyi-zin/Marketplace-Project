@@ -109,4 +109,20 @@ router.post(
   productController.savedProduct
 );
 
+// get save products
+// POST /saved-products/:id
+router.get(
+  "/saved-products/",
+  authMiddleware,
+  productController.getSavedProducts
+);
+
+// delete saved product
+// DELETE /unsaved-products/:id
+router.delete(
+  "/unsaved-products/:id",
+  authMiddleware,
+  productController.unSavedProduct
+);
+
 module.exports = router;

@@ -289,3 +289,43 @@ exports.savedProduct = async (req, res) => {
     });
   }
 };
+
+exports.getSavedProducts = async (req, res) => {
+  try {
+    const productDocs = await SavedProduct.find({
+      user_id: req.userId,
+    }).populate("product_id", "name category images description");
+
+    if (!productDocs || productDocs.length === 0) {
+      throw new Error("Products are not saved yet.");
+    }
+
+    return res.status(200).json({
+      isSuccess: true,
+      productDocs,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.unSavedProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await SavedProduct.findOneAndDelete({ product_id: id });
+
+    return res.status(200).json({
+      isSuccess: true,
+      message: "Product removed from the list.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};

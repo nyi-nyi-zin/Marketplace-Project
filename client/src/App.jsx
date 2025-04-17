@@ -7,7 +7,7 @@ import Profile from "./pages/profile/Index";
 import Admin from "./pages/admin/Index";
 import AuthProvider from "./providers/AuthProvider";
 import Details from "./pages/HomePage/Details";
-import SavedProducts from "./pages/savedProduct/index";
+import SavedProducts from "./pages/savedProduct/Index";
 
 const App = () => {
   const router = createBrowserRouter([
