@@ -121,9 +121,17 @@ export const getProductsByFilters = async (key, value) => {
 //get product by id
 export const getProductById = async (id) => {
   try {
-    const response = await axiosInstance.get(
-      `/api/products/${id}`
-    );
+    const response = await axiosInstance.get(`/api/products/${id}`);
+    return response.data;
+  } catch (error) {
+    return error.message;
+  }
+};
+
+// save proeduct
+export const savedProduct = async (id) => {
+  try {
+    const response = await axiosInstance.post(`/saved-products/${id}`);
     return response.data;
   } catch (error) {
     return error.message;

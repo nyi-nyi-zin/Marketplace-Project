@@ -71,23 +71,23 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-exports.getProductById = async (req, res) => {
-  try {
-    const productDocs = await Product.findById(req.params.id).populate(
-      "seller email username"
-    );
+// exports.getProductById = async (req, res) => {
+//   try {
+//     const productDocs = await Product.findById(req.params.id).populate(
+//       "seller email username"
+//     );
 
-    if (!productDoc) {
-      throw new Error("Product not found");
-    }
-    return res.status(200).json({
-      isSuccess: true,
-      productDocs,
-    });
-  } catch (err) {
-    return res.status(404).json({
-      isSuccess: false,
-      message: err.message,
-    });
-  }
-};
+//     if (!productDoc) {
+//       throw new Error("Product not found");
+//     }
+//     return res.status(200).json({
+//       isSuccess: true,
+//       productDocs,
+//     });
+//   } catch (err) {
+//     return res.status(404).json({
+//       isSuccess: false,
+//       message: err.message,
+//     });
+//   }
+// };

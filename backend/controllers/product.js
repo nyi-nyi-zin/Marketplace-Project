@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { validationResult } = require("express-validator");
 const Product = require("../models/Product");
+const SavedProduct = require("../models/SavedProduct");
 const { v2: cloudinary } = require("cloudinary");
 
 cloudinary.config({
@@ -262,6 +263,27 @@ exports.deleteProductImages = async (req, res) => {
     });
   } catch (error) {
     return res.status(404).json({
+      isSuccess: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.savedProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await SavedProduct.create({
+      user_id: req.userId,
+      product_id: id,
+    });
+
+    return res.status(200).json({
+      isSuccess: true,
+      message: "product saved",
+    });
+  } catch (error) {
+    return res.status(401).json({
       isSuccess: false,
       message: error.message,
     });

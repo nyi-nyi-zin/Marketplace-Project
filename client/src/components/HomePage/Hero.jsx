@@ -27,7 +27,7 @@ const Hero = ({ setProducts, getAllProducts }) => {
   return (
     <div className="w-full text-center mb-2 mt-10">
       <h1 className="text-4xl font-bold text-blue-600 mb-4">
-        "Discover, Connect, and Thrive with TradeHub"
+        "Discover, Connect, and Thrive with NyiHub"
       </h1>
       <p className=" text-lg font-medium text-gray-500 max-w-xl mx-auto mb-4">
         Bings buyers and sellers together, providing trust, community, and

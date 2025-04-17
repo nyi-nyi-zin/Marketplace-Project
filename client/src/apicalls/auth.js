@@ -31,6 +31,6 @@ export const checkCurrentUser = async () => {
     });
     return response.data;
   } catch (error) {
-    return error.message;
+    return { isSuccess: false, message: error.message };
   }
 };

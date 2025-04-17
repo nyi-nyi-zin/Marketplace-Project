@@ -13,6 +13,7 @@ const Details = () => {
   const findById = async () => {
     try {
       const response = await getProductById(params.id);
+      console.log(response.productDoc);
       if (response.isSuccess) {
         setProduct(response.productDoc);
       } else {
@@ -23,7 +24,7 @@ const Details = () => {
     }
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     findById();
   }, []);
 
@@ -31,7 +32,7 @@ const Details = () => {
     <section className="flex items-start justify-between mt-20">
       {product && product.category && product.seller && (
         <>
-          <div className="w-1/3"> 
+          <div className="w-1/3">
             {product && product.images && product.images.length > 0 ? (
               <>
                 <img

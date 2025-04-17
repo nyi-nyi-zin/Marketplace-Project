@@ -6,7 +6,7 @@ import { PowerIcon } from "@heroicons/react/24/outline";
 const General = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { email, name, role } = useSelector((state) => state.reducer.user.user);
+  const { email, name, role } = useSelector((state) => state.reducer.user);
 
   const logouthandler = () => {
     localStorage.removeItem("token");

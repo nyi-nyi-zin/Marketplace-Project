@@ -138,7 +138,15 @@ const ProductForm = ({
       <h1 className="text-3xl font-semibold my-2">
         {editMode ? "Update your product here." : "What you want to sell ?"}
       </h1>
-      <Form layout="vertical" onFinish={onFinishHandler} form={form}>
+      <Form
+        layout="vertical"
+        onFinish={onFinishHandler}
+        form={form}
+        initialValues={{
+          product_category: "",
+          product_details: [],
+        }}
+      >
         <Form.Item
           name="product_name"
           label="Product Name"
@@ -189,7 +197,7 @@ const ProductForm = ({
                 },
               ]}
             >
-              <Select defaultValue={""} options={options} />
+              <Select options={options} />
             </Form.Item>
           </Col>
           <Col span={8}>
@@ -208,7 +216,7 @@ const ProductForm = ({
           </Col>
         </Row>
         <Form.Item name="product_details" label="This product is have">
-          <Checkbox.Group options={checkBoxOptions} defaultValue={[""]} />
+          <Checkbox.Group options={checkBoxOptions} />
         </Form.Item>
         <button
           type="submit"

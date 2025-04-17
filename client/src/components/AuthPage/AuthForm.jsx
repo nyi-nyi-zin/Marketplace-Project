@@ -18,7 +18,7 @@ const AuthForm = ({ isLoginPage }) => {
     // Set both the Redux state and the local state
     dispatch(setLoader(true));
     setLocalProcessing(true);
-    
+
     try {
       if (isLoginPage) {
         const response = await loginUser(values);
@@ -122,7 +122,7 @@ const AuthForm = ({ isLoginPage }) => {
               {buttonIsLoading && !isLoginPage && "Registering ..."}
             </button>
           </Form.Item>
-          <p>
+          <Form.Item>
             {isLoginPage ? (
               <p>
                 Don't have an account?{" "}
@@ -144,7 +144,7 @@ const AuthForm = ({ isLoginPage }) => {
                 </Link>
               </p>
             )}
-          </p>
+          </Form.Item>
         </Form>
       </div>
     </section>
