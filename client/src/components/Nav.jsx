@@ -1,17 +1,31 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
-import { UserIcon } from "@heroicons/react/24/solid";
-import { BookmarkIcon } from "@heroicons/react/24/outline";
+import {
+  BookmarkIcon,
+  UserIcon,
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/solid";
+
+import { setUser } from "../store/slices/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Nav = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.reducer.user);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    dispatch(setUser(null));
+    navigate("/");
+  };
 
   return (
     <nav className=" flex items-center justify-between text-blue-600 py-4 mb-4">
       <Link className="font-bold text-4xl " to={"/"}>
-        NyiHub
+        TradeHub
       </Link>
       <div className=" flex items-center gap-3">
         <Link to={"/about"}>About</Link>
@@ -23,7 +37,6 @@ const Nav = () => {
           {user.role === "user" && (
             <Link to={"/profile"} className="  px-2 py-1 flex items-end gap-1">
               <UserIcon width={26} />
-              Profile
             </Link>
           )}
           {user.role === "admin" && (
@@ -34,10 +47,15 @@ const Nav = () => {
           )}
           <Link
             to={"/saved-products"}
-            className="  px-2 py-1 flex items-end gap-1"
+            className="px-2 py-1 flex items-end gap-1"
           >
             <BookmarkIcon width={26} />
           </Link>
+          <ArrowRightOnRectangleIcon
+            width={26}
+            onClick={logout}
+            className="text-red-600 cursor-pointer"
+          />
         </div>
       ) : (
         <div className=" flex items-center gap-3 text-base font-medium">
