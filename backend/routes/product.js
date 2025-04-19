@@ -4,7 +4,9 @@ const { body } = require("express-validator");
 const router = Router();
 
 const productController = require("../controllers/product");
+const bidController = require("../controllers/bid");
 const authMiddleware = require("../middleware/auth");
+const notificationController = require("../controllers/notification");
 
 // add product
 // POST /create-product
@@ -32,6 +34,9 @@ router.post(
       .trim()
       .notEmpty()
       .withMessage("product usedFor must have."),
+    body("product_details")
+      .isArray()
+      .withMessage("product details must array."),
   ],
   productController.addNewProduct
 );
@@ -110,9 +115,9 @@ router.post(
 );
 
 // get save products
-// POST /saved-products/:id
+// GET /saved-products
 router.get(
-  "/saved-products/",
+  "/saved-products",
   authMiddleware,
   productController.getSavedProducts
 );
@@ -123,6 +128,34 @@ router.delete(
   "/unsaved-products/:id",
   authMiddleware,
   productController.unSavedProduct
+);
+
+// save new bid
+// POST /add-bid
+router.post(
+  "/add-bid",
+  [
+    body("message").trim().notEmpty().withMessage("Message name must have."),
+    body("phone").trim().notEmpty().withMessage("Phone number must have."),
+  ],
+  authMiddleware,
+  bidController.savedNewBid
+);
+
+// get all bids
+// GET /bids/:product_id
+router.get("/bids/:product_id", bidController.getAllBids);
+
+// push noti
+// POST /notify
+router.post("/notify", authMiddleware, notificationController.pushNofification);
+
+// get noti
+// GET /notifications
+router.get(
+  "/notifications",
+  authMiddleware,
+  notificationController.getNotifications
 );
 
 module.exports = router;

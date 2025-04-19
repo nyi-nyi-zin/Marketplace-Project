@@ -1,14 +1,22 @@
-import { useEffect, useState } from "react";
-import { getAllProducts } from "../../apicalls/product";
-import { message } from "antd";
-import { Tabs } from "antd";
+import { Tabs, message } from "antd";
 import Products from "./Products";
 import ManageProduct from "./ManageProduct";
 import General from "./General";
+import { useState, useEffect } from "react";
+import { getAllProducts } from "../../apicalls/product";
+import {
+  BellAlertIcon,
+  SquaresPlusIcon,
+  SwatchIcon,
+  UserIcon,
+} from "@heroicons/react/24/solid";
+import { getAllNoti } from "../../apicalls/notification";
+import Notification from "./Notification";
 
 const Index = () => {
   const [activeTabKey, setActiveTabKey] = useState("1");
   const [products, setProducts] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
   const [manageTabKey, setManageTabKey] = useState("1");
@@ -26,6 +34,19 @@ const Index = () => {
     }
   };
 
+  const getNoti = async () => {
+    try {
+      const response = await getAllNoti();
+      if (response.isSuccess) {
+        setNotifications(response.notiDocs);
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   useEffect(
     (_) => {
       if (activeTabKey === "1") {
@@ -33,13 +54,20 @@ const Index = () => {
         setEditProductId(null);
       }
       getProducts();
+      getNoti();
     },
     [activeTabKey]
   );
+
   const items = [
     {
       key: "1",
-      label: "Products",
+      label: (
+        <span className="flex items-start gap-2">
+          <SwatchIcon width={20} />
+          Products
+        </span>
+      ),
       children: (
         <Products
           products={products}
@@ -53,7 +81,12 @@ const Index = () => {
     },
     {
       key: "2",
-      label: "Manage Product",
+      label: (
+        <span className="flex items-start gap-2">
+          <SquaresPlusIcon width={20} />
+          Manage Product
+        </span>
+      ),
       children: (
         <ManageProduct
           setActiveTabKey={setActiveTabKey}
@@ -66,12 +99,22 @@ const Index = () => {
     },
     {
       key: "3",
-      label: "Notification",
-      children: "Content of Tab Pane 3",
+      label: (
+        <span className="flex items-start gap-2">
+          <BellAlertIcon width={20} />
+          Notifications
+        </span>
+      ),
+      children: <Notification notifications={notifications} />,
     },
     {
       key: "4",
-      label: "General",
+      label: (
+        <span className="flex items-start gap-2">
+          <UserIcon width={20} />
+          Profile
+        </span>
+      ),
       children: <General />,
     },
   ];
@@ -79,14 +122,18 @@ const Index = () => {
   const onChangeHandler = (key) => {
     setActiveTabKey(key);
   };
+
   return (
-    <Tabs
-      activeKey={activeTabKey}
-      onChange={(key) => onChangeHandler(key)}
-      items={items}
-      tabPosition="left"
-      size="large"
-    />
+    <section>
+      <Tabs
+        activeKey={activeTabKey}
+        onChange={(key) => onChangeHandler(key)}
+        items={items}
+        tabPosition="left"
+        size="large"
+      />
+    </section>
   );
 };
+
 export default Index;
