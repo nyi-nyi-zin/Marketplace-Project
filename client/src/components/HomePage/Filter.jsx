@@ -55,8 +55,7 @@ const Filter = ({ setProducts, getAllProducts }) => {
         throw new Error(response.message);
       }
     } catch (err) {
-      console.log(err);
-      message.error(err?.message || "Something went wrong");
+      message.error(err.message);
     }
     dispatch(setLoader(false));
   };
@@ -67,7 +66,7 @@ const Filter = ({ setProducts, getAllProducts }) => {
   };
 
   return (
-    <div className=" flex items-center gap-3 my-8 max-w-4xl mx-auto flex-wrap justify-center">
+    <div className=" flex items-center gap-3 my-8 max-w-6xl mx-auto flex-wrap justify-center">
       {Categories.map((category, index) => (
         <p
           key={category.value}

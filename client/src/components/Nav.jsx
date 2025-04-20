@@ -25,7 +25,11 @@ const Nav = () => {
   return (
     <nav className=" flex items-center justify-between text-blue-600 py-4 mb-4">
       <Link className="font-bold text-4xl " to={"/"}>
-        TradeHub
+        <img
+          src="/logo.png"
+          alt="Miracle"
+          className="rounded-full w-20 h-20 "
+        />
       </Link>
       <div className=" flex items-center gap-3">
         <Link to={"/about"}>About</Link>

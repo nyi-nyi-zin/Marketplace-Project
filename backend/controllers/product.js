@@ -1,8 +1,8 @@
-require("dotenv").config();
 const { validationResult } = require("express-validator");
 const Product = require("../models/Product");
 const SavedProduct = require("../models/SavedProduct");
 const { v2: cloudinary } = require("cloudinary");
+require("dotenv").config();
 
 cloudinary.config({
   cloud_name: "da2xt5ryb",
@@ -10,7 +10,7 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API,
 });
 
-exports.addNewProduct = async (req, res, next) => {
+exports.addNewProduct = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -19,6 +19,7 @@ exports.addNewProduct = async (req, res, next) => {
       message: errors.array()[0].msg,
     });
   }
+
   const {
     product_name,
     product_description,
@@ -38,9 +39,10 @@ exports.addNewProduct = async (req, res, next) => {
       details: product_details,
       seller: req.userId,
     });
+
     return res.status(201).json({
       isSuccess: true,
-      message: "Product added to sell list",
+      message: "Product added to sell list.",
       productDoc,
     });
   } catch (err) {
@@ -71,7 +73,6 @@ exports.getAllProducts = async (req, res) => {
 exports.getOldProduct = async (req, res) => {
   try {
     const productDoc = await Product.findOne({ _id: req.params.id });
-
     return res.status(200).json({
       isSuccess: true,
       productDoc,
@@ -107,7 +108,7 @@ exports.updateProduct = async (req, res) => {
     } = req.body;
 
     if (req.userId.toString() !== seller_id) {
-      throw new Error("Authorization Failed");
+      throw new Error("Authorization Failed.");
     }
 
     const productDoc = await Product.findOne({ _id: product_id });
@@ -121,13 +122,13 @@ exports.updateProduct = async (req, res) => {
 
     return res.status(200).json({
       isSuccess: true,
-      message: "Product details updated",
+      message: "Product details are updated.",
       productDoc,
     });
-  } catch (error) {
+  } catch (err) {
     return res.status(422).json({
       isSuccess: false,
-      message: error.message,
+      message: err.message,
     });
   }
 };
@@ -141,12 +142,12 @@ exports.deleteProduct = async (req, res) => {
     if (!productDoc) {
       return res.status(404).json({
         isSuccess: false,
-        message: "Product not found",
+        message: "Product not found.",
       });
     }
 
     if (req.userId.toString() !== productDoc.seller.toString()) {
-      throw new Error("Authorization Failed");
+      throw new Error("Authorization Failed.");
     }
 
     if (productDoc.images && Array.isArray(productDoc.images)) {
@@ -155,13 +156,11 @@ exports.deleteProduct = async (req, res) => {
           img.lastIndexOf("/") + 1,
           img.lastIndexOf(".")
         );
-
         return new Promise((resolve, reject) => {
           cloudinary.uploader.destroy(publicId, (err, result) => {
             if (err) {
-              reject(new Error("Destroy Failed"));
+              reject(new Error("Destroy Failed."));
             } else {
-              console.log(result);
               resolve(result);
             }
           });
@@ -171,26 +170,31 @@ exports.deleteProduct = async (req, res) => {
       await Promise.all(deletePromise);
     }
 
-    await Product.findByIdAndDelete(id);
+    await Product.findByIdAndRemove(id);
+
     return res.status(202).json({
       isSuccess: true,
-      message: "Product deleted",
+      message: "Product destroy.",
       productDoc,
     });
-  } catch (error) {
-    return res.status(202).json({
+  } catch (err) {
+    return res.status(422).json({
       isSuccess: false,
-      message: error.message,
+      message: err.message,
     });
   }
 };
 
-//uploadImage
-exports.uploadProductImages = async (req, res) => {
+exports.uploadProductImage = async (req, res) => {
   const productImages = req.files;
-  console.log(productImages);
   const productId = req.body.product_id;
   let secureUrlArray = [];
+
+  const productDoc = await Product.findOne({ _id: productId });
+
+  if (req.userId.toString() !== productDoc.seller.toString()) {
+    throw new Error("Authorization Failed.");
+  }
 
   try {
     productImages.forEach((img) => {
@@ -205,33 +209,40 @@ exports.uploadProductImages = async (req, res) => {
             });
             return res.status(200).json({
               isSuccess: true,
-              message: "Product images saved",
+              message: "Product images saved.",
               secureUrlArray,
             });
           }
         } else {
-          throw new Error("Cloud Upload Failed");
+          throw new Error("Cloud upload Failed.");
         }
       });
     });
-  } catch (error) {
+  } catch (err) {
     return res.status(404).json({
       isSuccess: false,
-      message: error.message,
+      message: err.message,
     });
   }
 };
 
 exports.getSavedImages = async (req, res) => {
   const { id } = req.params;
+
   try {
-    const productDoc = await Product.findById(id).select("images");
-    if (!productDoc) {
-      throw new Error("Product not found");
+    const productDoc = await Product.findById(id).select("images seller");
+
+    if (req.userId.toString() !== productDoc.seller.toString()) {
+      throw new Error("Authorization Failed.");
     }
+
+    if (!productDoc) {
+      throw new Error("Product not found.");
+    }
+
     return res.status(200).json({
       isSuccess: true,
-      message: "Product images are fetched",
+      message: "Product images are fetched.",
       data: productDoc,
     });
   } catch (err) {
@@ -247,6 +258,12 @@ exports.deleteProductImages = async (req, res) => {
     const productId = req.params.productId;
     const decodeImgToDelete = decodeURIComponent(req.params.imgToDelete);
 
+    const productDoc = await Product.findOne({ _id: productId });
+
+    if (req.userId.toString() !== productDoc.seller.toString()) {
+      throw new Error("Authorization Failed.");
+    }
+
     await Product.findByIdAndUpdate(productId, {
       $pull: { images: decodeImgToDelete },
     });
@@ -255,16 +272,17 @@ exports.deleteProductImages = async (req, res) => {
       decodeImgToDelete.lastIndexOf("/") + 1,
       decodeImgToDelete.lastIndexOf(".")
     );
+
     await cloudinary.uploader.destroy(publicId);
 
     return res.status(200).json({
       isSuccess: true,
-      message: "Image destroyed",
+      message: "Image destroyed.",
     });
-  } catch (error) {
+  } catch (err) {
     return res.status(404).json({
       isSuccess: false,
-      message: error.message,
+      message: err.message,
     });
   }
 };
@@ -278,7 +296,7 @@ exports.savedProduct = async (req, res) => {
     });
 
     if (isExists) {
-      throw new Error("Product is already Saved!!!");
+      throw new Error("Product is already saved.");
     }
 
     await SavedProduct.create({
@@ -288,10 +306,10 @@ exports.savedProduct = async (req, res) => {
 
     return res.status(200).json({
       isSuccess: true,
-      message: "product saved",
+      message: "Product Saved.",
     });
   } catch (error) {
-    return res.status(401).json({
+    return res.status(404).json({
       isSuccess: false,
       message: error.message,
     });
@@ -305,7 +323,7 @@ exports.getSavedProducts = async (req, res) => {
     }).populate("product_id", "name category images description price");
 
     if (!productDocs || productDocs.length === 0) {
-      throw new Error("Products are not saved yet.");
+      throw new Error("No products are not saved yet.");
     }
 
     return res.status(200).json({
@@ -324,7 +342,7 @@ exports.unSavedProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await SavedProduct.findOneAndDelete({ product_id: id });
+    await SavedProduct.findOneAndRemove({ product_id: id });
 
     return res.status(200).json({
       isSuccess: true,

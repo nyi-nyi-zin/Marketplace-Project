@@ -2,14 +2,29 @@ const Product = require("../models/Product");
 const User = require("../models/User");
 
 exports.getAllProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPage = 10;
+
   try {
     const productDocs = await Product.find()
       .populate("seller", "name")
-      .sort({ createdAt: -1 });
-    console.log(productDocs);
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+
+    const totalProducts = await Product.countDocuments();
+    const pendingProducts = await Product.find({
+      status: "pending",
+    }).countDocuments();
+    const totalPages = Math.ceil(totalProducts / perPage);
+
     return res.status(200).json({
       isSuccess: true,
       productDocs,
+      totalPages,
+      currentPage: page,
+      pendingProducts,
+      totalProducts,
     });
   } catch (err) {
     return res.status(422).json({
@@ -26,14 +41,15 @@ exports.approveProduct = async (req, res) => {
     const productDoc = await Product.findById(id);
 
     if (!productDoc) {
-      throw new Error("Produt Not found");
+      throw new Error("Product not found.");
     }
+
     productDoc.status = "approve";
     await productDoc.save();
 
     return res.status(200).json({
       isSuccess: true,
-      message: "Product is approved",
+      message: "Product was approved.",
     });
   } catch (err) {
     return res.status(500).json({
@@ -50,14 +66,15 @@ exports.rejectProduct = async (req, res) => {
     const productDoc = await Product.findById(id);
 
     if (!productDoc) {
-      throw new Error("Produt Not found");
+      throw new Error("Product not found.");
     }
+
     productDoc.status = "reject";
     await productDoc.save();
 
     return res.status(200).json({
       isSuccess: true,
-      message: "Product was rejected",
+      message: "Product was reject.",
     });
   } catch (err) {
     return res.status(500).json({
@@ -74,14 +91,15 @@ exports.rollbackProduct = async (req, res) => {
     const productDoc = await Product.findById(id);
 
     if (!productDoc) {
-      throw new Error("Produt Not found");
+      throw new Error("Product not found.");
     }
+
     productDoc.status = "pending";
     await productDoc.save();
 
     return res.status(200).json({
       isSuccess: true,
-      message: "Product was rollback",
+      message: "Product was roll back.",
     });
   } catch (err) {
     return res.status(500).json({
@@ -91,15 +109,14 @@ exports.rollbackProduct = async (req, res) => {
   }
 };
 
-//get all users
 exports.getUsers = async (req, res) => {
   try {
-    const UserDocs = await User.find()
+    const userDocs = await User.find()
       .select("name email role createdAt status")
       .sort({ createdAt: -1 });
     return res.status(200).json({
       isSuccess: true,
-      UserDocs,
+      userDocs,
     });
   } catch (err) {
     return res.status(422).json({
@@ -116,14 +133,15 @@ exports.banUser = async (req, res) => {
     const userDoc = await User.findById(id);
 
     if (!userDoc) {
-      throw new Error("user Not found");
+      throw new Error("User not found.");
     }
+
     userDoc.status = "banned";
     await userDoc.save();
 
     return res.status(200).json({
       isSuccess: true,
-      message: "user was banned",
+      message: "User was banned",
     });
   } catch (err) {
     return res.status(500).json({
@@ -140,14 +158,15 @@ exports.unbanUser = async (req, res) => {
     const userDoc = await User.findById(id);
 
     if (!userDoc) {
-      throw new Error("user Not found");
+      throw new Error("User not found.");
     }
+
     userDoc.status = "active";
     await userDoc.save();
 
     return res.status(200).json({
       isSuccess: true,
-      message: "user was unbanned",
+      message: "User was unbanned",
     });
   } catch (err) {
     return res.status(500).json({

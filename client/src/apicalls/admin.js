@@ -1,11 +1,14 @@
 import { axiosInstance } from "./axiosInstance";
 
 // get all products
-export const getAllProducts = async () => {
+export const getAllProducts = async (page, perPage) => {
   try {
-    const response = await axiosInstance.get("/admin/products", {
-      validateStatus: () => true,
-    });
+    const response = await axiosInstance.get(
+      `/admin/products?page=${page}&perPage=${perPage}`,
+      {
+        validateStatus: () => true,
+      }
+    );
     return response.data;
   } catch (error) {
     return error.message;
@@ -27,7 +30,7 @@ export const approveProduct = async (productId) => {
   }
 };
 
-//reject product
+// reject product
 export const rejectProduct = async (productId) => {
   try {
     const response = await axiosInstance.post(
@@ -42,7 +45,7 @@ export const rejectProduct = async (productId) => {
   }
 };
 
-//rollback product
+// rollback product
 export const rollBackProduct = async (productId) => {
   try {
     const response = await axiosInstance.post(
@@ -58,7 +61,6 @@ export const rollBackProduct = async (productId) => {
 };
 
 // get users
-
 export const getAllUsers = async () => {
   try {
     const response = await axiosInstance.get("/admin/users", {
@@ -70,8 +72,7 @@ export const getAllUsers = async () => {
   }
 };
 
-//ban user
-// /admin/user-ban/:id
+// ban user
 export const banUser = async (userId) => {
   try {
     const response = await axiosInstance.post(`/admin/user-ban/${userId}`, {
@@ -83,8 +84,7 @@ export const banUser = async (userId) => {
   }
 };
 
-//unBan user
-// /admin/user-unBan/:id
+// unban user
 export const unBanUser = async (userId) => {
   try {
     const response = await axiosInstance.post(`/admin/user-unban/${userId}`, {

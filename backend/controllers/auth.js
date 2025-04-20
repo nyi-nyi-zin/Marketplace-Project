@@ -50,26 +50,22 @@ exports.login = async (req, res, next) => {
   }
   const { email, password } = req.body;
   try {
-    //is email exists
     const userDoc = await User.findOne({ email });
 
     if (!userDoc) {
       throw new Error("E-mail does not exists");
     }
 
-    //check password
     const isMatch = await bcrypt.compare(password, userDoc.password);
 
     if (!isMatch) {
       throw new Error("Invalid password");
     }
 
-    // account status check
     if (userDoc.status === "banned") {
       throw new Error("This account was banned");
     }
 
-    //create jwt token
     const token = jwt.sign({ userId: userDoc._id }, process.env.JWT_KEY, {
       expiresIn: "1d",
     });

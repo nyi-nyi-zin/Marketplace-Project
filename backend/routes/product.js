@@ -86,9 +86,9 @@ router.post(
 // DELETE /products/:id
 router.delete("/products/:id", authMiddleware, productController.deleteProduct);
 
-// upload product
+// upload product image
 // POST /upload
-router.post("/upload", authMiddleware, productController.uploadProductImages);
+router.post("/upload", authMiddleware, productController.uploadProductImage);
 
 // get saved product images
 // GET /product-images/:id
@@ -156,6 +156,30 @@ router.get(
   "/notifications",
   authMiddleware,
   notificationController.getNotifications
+);
+
+// make noti as read
+// GET /notifications-read/:id
+router.get(
+  "/notifications-read/:id",
+  authMiddleware,
+  notificationController.markAsRead
+);
+
+// delete noti
+// DELETE /notification-delete/:id
+router.delete(
+  "/notification-delete/:id",
+  authMiddleware,
+  notificationController.deleteNoti
+);
+
+// delete all noti
+// DELETE /notification-delete-all
+router.delete(
+  "/notification-delete-all",
+  authMiddleware,
+  notificationController.deleteAllNoti
 );
 
 module.exports = router;
